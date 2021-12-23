@@ -60,7 +60,7 @@ $ docker ps
 ```
 
 ### Configure RabbitMQ
-By default logstash will set the message routing key according to the log filename, for example, logs messages from the file ```conn.log``` will have it's routing key set to ```zeek.conn```. Please make sure you have created the queues and exchange key bindings for the desired log files.
+By default logstash will set the message routing key according to the log filename, for example, logs messages from the file ```conn.log``` will have it's routing key set to ```zeek.conn```. Please make sure you have created the queues and exchange key bindings for the desired log files, you can check Zeek's available logs [here](https://docs.zeek.org/en/master/script-reference/log-files.html).
 > **Note**: This process will be automated in the future
 >
 > **Note**: By default, logstash will send the messages to the ```amq.direct``` exchange.
