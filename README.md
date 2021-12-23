@@ -46,7 +46,7 @@ $ sudo systemctl enable --now docker
 $ git clone https://github.com/nonvegan/FISHY-NetAnalysis.git
 ```
 ### Configure Zeek
-Please configure zeek in the [zeek entrypoint script](builds/zeek/script.sh) to listen on your desired interface, you can use the ```-i <interface>```. You can also load additional scripts, copying them to the [scripts folder](builds/zeek/scripts) and appending their name to the entrypoint command.
+Please configure zeek in the [zeek entrypoint script](builds/zeek/script.sh) to listen on your desired interface, you can use the ```-i <interface>``` flag. You can also load additional scripts, using the ones in the [Zeek's policy folder](https://github.com/zeek/zeek/tree/master/scripts/policy) or copying new ones to the [scripts folder](builds/zeek/scripts) and appending their name to the entrypoint command.
 
 ### Start the docker containers
 ```sh
