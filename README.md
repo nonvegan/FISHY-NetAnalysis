@@ -51,6 +51,16 @@ $ cd FISHY-NetAnalysis
 $ docker-compose build
 $ docker-compose up
 ```
+### Configure RabbitMQ
+By default logstash will set the message routing key according to the log filename, for example, logs messages from the file ```conn.log``` will have it's routing key set to ```zeek.conn```. Please make sure you have created the queues and exchange key bindings for the desired log files.
+> **Note**: This process will be automated in the future
+>
+> **Note**: By default, logstash will send the messages to the ```amq.direct``` exchange.
+
+For testing purposes this docker-compose build includes a rabbitmq instance, if you wish to use your own rabbitMQ instance please delete the service entry from the [docker-compose.yml file](docker-compose.yml) and configure the [logstash config file](builds/logstash/logstash.conf) with your own credentials. 
+
+You can access the RabbitMQ management page at ```http://localhost:15672``` with the username ```admin``` and password ```pleasechangeme```.
+
 
 
 
