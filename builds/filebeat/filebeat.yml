@@ -1,0 +1,22 @@
+logging.metrics.enabled: false
+filebeat.inputs:
+  - type: log
+    paths:
+      - /zeek-spool/*
+    # exclude_files: ['json_streaming_signatures\(_carved.*\)\.log$', 'json_streaming_loaded_scripts*.log']
+    symlinks: true
+    fields_under_root: true
+    compression_level: 0
+    exclude_lines: ['^\s*#']
+    close_renamed: false
+    scan_frequency: 1
+
+processors:
+  - drop_fields:
+      ignore_missing: true
+      fields: ["agent", "log", "input", "host", "ecs", "tags"]
+  
+output.logstash:
+  hosts: ["logstash:5044"]
+
+logging.level: error
