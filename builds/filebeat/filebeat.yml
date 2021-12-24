@@ -2,7 +2,7 @@ logging.metrics.enabled: false
 filebeat.inputs:
   - type: log
     paths:
-      - /zeek-spool/*
+      - /zeek-spool/*.log
     # exclude_files: ['json_streaming_signatures\(_carved.*\)\.log$', 'json_streaming_loaded_scripts*.log']
     symlinks: true
     fields_under_root: true
