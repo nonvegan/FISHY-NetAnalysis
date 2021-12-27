@@ -1,3 +1,0 @@
-pipeline.id: main
-api.enabled: false
-log.level: warn

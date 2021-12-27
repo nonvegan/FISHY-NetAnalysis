@@ -9,18 +9,16 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=pleasechangeme
-  filebeat:
-    container_name: filebeat
-    build: ./builds/filebeat/
+  fluentd:
+    container_name: fluentd
+    build: ./builds/fluentd/
     depends_on: 
       - zeek
     restart: always
     volumes:
       -  ./zeek-spool:/zeek-spool
-  logstash:
-    container_name: logstash
-    build: ./builds/logstash/
-    restart: always
+    # environment:
+    #     - FLUENT_UID=0
   zeek:
     container_name: zeek
     build: ./builds/zeek/
@@ -28,8 +26,3 @@ services:
     network_mode: "host"
     volumes:
       -  ./zeek-spool:/zeek-spool
-
-# volumes:
-#   zeek-spool:
-#     external: true
-#     mount_point: ./zeek-logs

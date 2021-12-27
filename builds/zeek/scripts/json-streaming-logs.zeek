@@ -26,7 +26,7 @@ export {
 	## If rotation is enabled, this is the rotation interval specifically for the 
 	## JSON streaming logs.  This is set separately since these logs are ephemeral
 	## and meant to be immediately carried off to some other storage and search system.
-	const JSONStreaming::rotation_interval = 1min &redef;
+	const JSONStreaming::rotation_interval = 5min &redef;
 }
 
 type JsonStreamingExtension: record {
