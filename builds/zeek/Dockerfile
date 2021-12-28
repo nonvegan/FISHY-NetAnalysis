@@ -2,11 +2,11 @@ FROM zeekurity/zeek:lts
 
 WORKDIR /zeek-spool
 
-COPY script.sh /script.sh
+COPY entrypoint.sh /entrypoint.sh
 
 COPY scripts/*.zeek /usr/local/zeek/share/zeek/site/
 
 ENTRYPOINT ["/bin/bash"]
 
-CMD ["/script.sh"]
+CMD ["/entrypoint.sh"]
 

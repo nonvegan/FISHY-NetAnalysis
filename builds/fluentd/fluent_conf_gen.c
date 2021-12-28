@@ -38,7 +38,7 @@ void main(void)
         fprintf(f, "\tpath %s/%s%s%s\n", ZEEK_LOGS_PATH, ZEEK_LOGS_PREFIX, zeek_log_file, ZEEK_LOGS_SUFFIX);
         fprintf(f, "\tpos_file %s/zeek_%s%s.pos\n", FLUENT_POS_FILES_PATH, ZEEK_LOGS_PREFIX, zeek_log_file);
         fprintf(f, "\tfollow_inodes true\n");
-        fprintf(f, "\refresh_interval 10\n");
+        fprintf(f, "\trefresh_interval 10\n");
         fprintf(f, "\t<parse>\n");
         fprintf(f, "\t\t@type json\n");
         fprintf(f, "\t</parse>\n");
