@@ -11,14 +11,15 @@
 #define ZEEK_LOGS_PREFIX "json_streaming_"
 #define ZEEK_LOGS_SUFFIX "*.log"
 
-#define RABBITMQ_HOST "rabbitmq"
-#define RABBITMQ_USER "admin"
+#define RABBITMQ_HOST "192.168.39.75"
+#define RABBITMQ_PORT "30001"
+#define RABBITMQ_USER "fishy-admin"
 #define RABBITMQ_PASS "pleasechangeme"
 #define RABBITMQ_VHOST "/"
 #define RABBITMQ_EXCHANGE "amq.direct"
 #define RABBITMQ_EXCHANGE_TYPE "direct"
 
-static const char *zeek_log_files[] = { "conn", "notice", "dns"};
+static const char *zeek_log_files[] = { "conn", "notice", "dns", "http"};
 
 void main(void)
 {
@@ -48,6 +49,7 @@ void main(void)
     fprintf(f, "<match %s*>\n", FLUENT_ZEEK_LOGS_TAG_PREFIX);
     fprintf(f, "\t@type rabbitmq\n");
     fprintf(f, "\thost %s\n", RABBITMQ_HOST);
+    fprintf(f, "\tport %s\n", RABBITMQ_PORT);
     fprintf(f, "\tuser %s\n", RABBITMQ_USER);
     fprintf(f, "\tpass %s\n", RABBITMQ_PASS);
     fprintf(f, "\tvhost %s\n", RABBITMQ_VHOST);

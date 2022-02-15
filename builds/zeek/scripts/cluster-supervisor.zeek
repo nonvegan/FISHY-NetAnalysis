@@ -2,7 +2,7 @@ event zeek_init()
 {
     if ( Supervisor::is_supervisor() )
     {
-        local sn = Supervisor::NodeConfig($name="foo", $interface="wlp2s0");
+        local sn = Supervisor::NodeConfig($name="foo", $interface="");
         local res = Supervisor::create(sn);
 
         if ( res == "" )
