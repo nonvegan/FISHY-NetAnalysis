@@ -18,7 +18,7 @@ In this document we provide a simple and brief description of the FISHY behavior
 We will use Zeek both to generate and report network behavioural metrics(ex. SYN packets/s) and also load some predefined scripts to detected and report certain anomalies (ex. [SSH Brutefocing](https://github.com/zeek/zeek/blob/master/scripts/policy/protocols/ssh/detect-bruteforcing.zeek)).
 
 ### Fluentd
-
+Fluentd is an open source log shipper, which lets you unify the data collection and consumption. We will use Fluentd to watch logs produced by Zeek and ship them to specific RabbitMQ queues.
 
 ## Installation
 
@@ -35,6 +35,25 @@ $ sudo systemctl enable --now docker
 $ sudo pacman -S docker docker-compose
 $ sudo systemctl enable --now docker
 ```
+
+### Kubernetes
+Make sure you have both minikube & kubectl installed and that libvirtd.service is running.
+
+#### Ubuntu
+```sh
+$ curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+$ sudo dpkg -i minikube_latest_amd64.deb
+$ curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+$ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+```
+#### Arch
+```sh
+$ sudo pacman -S minikube kubectl
+$ usermod -aG libvirt $(whoami)
+$ sudo systemctl enable --now libvirtd
+$ minikube config set driver kvm2
+```
+
 ### Clone the repo
 
 ```sh
@@ -43,9 +62,20 @@ $ git clone https://github.com/nonvegan/FISHY-NetAnalysis.git
 ### Configure Zeek
 Please configure zeek in the [zeek entrypoint script](builds/zeek/script.sh) to listen on your desired interface, you can use the ```-i <interface>``` flag. You can also load additional scripts, using the ones in the [Zeek's policy folder](https://github.com/zeek/zeek/tree/master/scripts/policy) or copying new ones to the [scripts folder](builds/zeek/scripts) and appending their name to the entrypoint command.
 
-### Start the docker containers
+### Start the Kubernetes cluster
 ```sh
 $ cd FISHY-NetAnalysis
+$ minikube start
+$ kubectl apply -f rabbitmq.yml
+```
+You can check the status of the cluster using:
+```sh
+$ kubectl get svc
+```
+> **Note**: You can find the ip of minikube using ```minikube ip```
+
+### Start the docker containers
+```sh
 $ docker-compose build
 $ docker-compose up
 ```
