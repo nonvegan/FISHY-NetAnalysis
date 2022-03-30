@@ -1,7 +1,5 @@
 from zat.json_log_to_dataframe import JSONLogToDataFrame
-import plotly.express as px
 import plotly.graph_objects as go
-from pandas_profiling import ProfileReport
 
 log_to_df = JSONLogToDataFrame()
 
