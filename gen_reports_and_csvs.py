@@ -5,7 +5,10 @@ from pandas_profiling import ProfileReport
 log_to_df = JSONLogToDataFrame()
 
 logs = list(map(lambda x: x[5:-4], glob.glob("logs/*.log")))
-logs.remove("stats")
+
+for unwanted_log in ["packet_filter", "reporter"]:
+	logs.remove(unwanted_log)
+
 for log in logs:
     print(log)
     df = log_to_df.create_dataframe("logs/{}.log".format(log))
