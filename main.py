@@ -137,7 +137,8 @@ fig.write_html("4.html")
 
 fig = make_subplots(specs=[[{"secondary_y": True}]])
 fig.update_layout(title={ 'text': "SONAE Connection Duration"}, 
-                  x_axis_title="Number of packets", 
+                  xaxis_title="Date", 
+                  yaxis_title="Number of packets", 
                   yaxis2_title="Duration (s)", 
                   legend_title="Protocol")
 
