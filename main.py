@@ -88,7 +88,10 @@ def fig_apply_general_template():
 
 # Zeek Flows
 fig = go.Figure()
-fig.update_layout(title={ 'text': "SONAE Zeek logs"}, legend_title="Zeek file")
+fig.update_layout(title={ 'text': "SONAE Zeek logs"},
+                  xaxis_title="Date & Time ({} interval)".format(sample_interval.lower()),
+                  yaxis_title="Number of logs",
+                  legend_title="Zeek file")
 fig_apply_general_template()
 fig.add_trace(flow_count_trace(conn_df, "conn.log"))
 fig.add_trace(flow_count_trace(http_df, "http.log"))
@@ -97,22 +100,28 @@ fig.add_trace(flow_count_trace(ssl_df,  "ssl.log"))
 fig.add_trace(flow_count_trace(dce_rpc_df, "dce_rpc.log"))
 fig.add_trace(flow_count_trace(kerberos_df, "kerberos.log"))
 fig.show()
-fig.write_html("1.html")
+fig.write_html("zeek_logs_dash.html")
 
 # Zeek Connection Packets
 fig = go.Figure()
-fig.update_layout(title={ 'text': "SONAE Connection packets"}, legend_title="Packets")
+fig.update_layout(title={ 'text': "SONAE Connection Packets"},
+                  xaxis_title="Date & Time ({} interval)".format(sample_interval.lower()),
+                  yaxis_title="Number of Packets",
+                  legend_title="Packets")
 fig_apply_general_template()
 fig.add_trace(go.Scatter(x=conn_df.index, y=conn_df["total_pkts"], name="Total"))
 fig.add_trace(go.Scatter(x=conn_df.index, y=conn_df["orig_pkts"], name="Origin"))
 fig.add_trace(go.Scatter(x=conn_df.index, y=conn_df["resp_pkts"], name="Response"))
 fig.for_each_trace(lambda trace: trace.update(mode="lines", hoverinfo="name+x+y"))
 fig.show()
-fig.write_html("2.html")
+fig.write_html("zeek_packets_dash.html")
 
 # Zeek Connection bytes
 fig = go.Figure()
-fig.update_layout(title={ 'text': "SONAE Connection Bytes"}, legend_title="Bytes")
+fig.update_layout(title={ 'text': "SONAE Connection Bytes"},
+                  xaxis_title="Date & Time ({} interval)".format(sample_interval.lower()),
+                  yaxis_title="Number of Bytes",
+                  legend_title="Bytes")
 fig_apply_general_template()
 fig.add_trace(go.Scatter(x=conn_df.index, y=conn_df["total_bytes"], name="Payload Total"))
 fig.add_trace(go.Scatter(x=conn_df.index, y=conn_df["orig_bytes"], name="Payload Origin"))
@@ -122,24 +131,27 @@ fig.add_trace(go.Scatter(x=conn_df.index, y=conn_df["orig_ip_bytes"], name="Orig
 fig.add_trace(go.Scatter(x=conn_df.index, y=conn_df["resp_ip_bytes"], name="Response IP"))
 fig.for_each_trace(lambda trace: trace.update(mode="lines", hoverinfo="name+x+y"))
 fig.show()
-fig.write_html("3.html")
+fig.write_html("zeek_bytes_dash.html")
 
 # Zeek Connection by protocol
 fig = go.Figure()
-fig.update_layout(title={ 'text': "SONAE Connection Protocols"}, legend_title="Protocol")
+fig.update_layout(title={ 'text': "SONAE Connection Protocols"},
+                  xaxis_title="Date & Time ({} interval)".format(sample_interval.lower()),
+                  yaxis_title="Number of Connections",
+                  legend_title="Protocol")
 fig_apply_general_template()
 fig.add_trace(go.Scatter(x=conn_udp_df.index, y=conn_udp_df["flow_count"], marker=dict(color='#636efa'), text=conn_udp_df["flow_count"], name="udp"))
 fig.add_trace(go.Scatter(x=conn_tcp_df.index, y=conn_tcp_df["flow_count"], marker=dict(color='#ef553b'), text=conn_tcp_df["flow_count"], name="tcp"))
 fig.add_trace(go.Scatter(x=conn_icmp_df.index, y=conn_icmp_df["flow_count"], marker=dict(color='#00cc96'), text=conn_icmp_df["flow_count"], name="icmp"))
 fig.for_each_trace(lambda trace: trace.update(mode='lines+text+markers', textfont_color=trace.marker.color, textposition='top center', hoverinfo="name+x+y"))
 fig.show()
-fig.write_html("4.html")
+fig.write_html("zeek_proto_dash.html")
 
 fig = make_subplots(specs=[[{"secondary_y": True}]])
-fig.update_layout(title={ 'text': "SONAE Avg Connection Duration"}, 
-                  xaxis_title="Date", 
-                  yaxis_title="Number of packets", 
-                  yaxis2_title="Avg. Duration (s)", 
+fig.update_layout(title={ 'text': "SONAE Avg Connection Duration"},
+                  xaxis_title="Date & Time ({} interval)".format(sample_interval.lower()),
+                  yaxis_title="Number of packets",
+                  yaxis2_title="Avg. Duration (s)",
                   legend_title="Protocol")
 fig_apply_general_template()
 fig.add_trace(go.Scatter(x=conn_udp_df.index, y=conn_df["duration"] / conn_df["flow_count"], name="Duration", mode='lines'), secondary_y=True)
