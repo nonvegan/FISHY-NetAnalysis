@@ -1,5 +1,6 @@
 from zat.json_log_to_dataframe import JSONLogToDataFrame
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 log_to_df = JSONLogToDataFrame()
 
@@ -133,3 +134,17 @@ fig.add_trace(go.Scatter(x=conn_icmp_df.index, y=conn_icmp_df["flow_count"], mar
 fig.for_each_trace(lambda trace: trace.update(mode='lines+text+markers', textfont_color=trace.marker.color, textposition='top center', hoverinfo="name+x+y"))
 fig.show()
 fig.write_html("4.html")
+
+fig = make_subplots(specs=[[{"secondary_y": True}]])
+fig.update_layout(title={ 'text': "SONAE Connection Duration"}, 
+                  x_axis_title="Number of packets", 
+                  yaxis2_title="Duration (s)", 
+                  legend_title="Protocol")
+
+fig_update_layout()
+fig.add_trace(go.Scatter(x=conn_udp_df.index, y=conn_df["duration"] / conn_df["flow_count"], name="duration", mode='lines'), secondary_y=True)
+fig.add_trace(go.Bar(x=conn_udp_df.index, y=conn_df["orig_pkts"], name="Origin Packets"))
+fig.add_trace(go.Bar(x=conn_udp_df.index, y=conn_df["resp_pkts"], name="Response Packets"))
+fig.update_layout(barmode='stack')
+fig.show()
+fig.write_html("zeek_conn_packets_duration_dash.html")
