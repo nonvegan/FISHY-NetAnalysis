@@ -136,14 +136,13 @@ fig.show()
 fig.write_html("4.html")
 
 fig = make_subplots(specs=[[{"secondary_y": True}]])
-fig.update_layout(title={ 'text': "SONAE Connection Duration"}, 
+fig.update_layout(title={ 'text': "SONAE Avg Connection Duration"}, 
                   xaxis_title="Date", 
                   yaxis_title="Number of packets", 
-                  yaxis2_title="Duration (s)", 
+                  yaxis2_title="Avg. Duration (s)", 
                   legend_title="Protocol")
-
-fig_update_layout()
-fig.add_trace(go.Scatter(x=conn_udp_df.index, y=conn_df["duration"] / conn_df["flow_count"], name="duration", mode='lines'), secondary_y=True)
+fig_apply_general_template()
+fig.add_trace(go.Scatter(x=conn_udp_df.index, y=conn_df["duration"] / conn_df["flow_count"], name="Duration", mode='lines'), secondary_y=True)
 fig.add_trace(go.Bar(x=conn_udp_df.index, y=conn_df["orig_pkts"], name="Origin Packets"))
 fig.add_trace(go.Bar(x=conn_udp_df.index, y=conn_df["resp_pkts"], name="Response Packets"))
 fig.update_layout(barmode='stack')
