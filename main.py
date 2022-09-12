@@ -37,7 +37,17 @@ def size_in_megabytes(x):
 
 def log_to_df_print(filenames, i):
     print("Loading {} to a dataframe {}/{}".format(filenames[i], i + 1, len(filenames)))
-    return log_to_df.create_dataframe(filenames[i])
+    df = log_to_df.create_dataframe(filenames[i])
+    for col in [
+        "uid",
+        "conn_state",
+        "history",
+        "service",
+        "proto",
+        "orig_l2_addr",
+        "resp_l2_addr",
+    ]:
+        df.drop(col, axis=1, inplace=True)
 
 
 def start_date(first_log_filename):
@@ -67,11 +77,16 @@ for i in range(len(conn_files)):
     sub_conn_df = add_flow_count(sub_conn_df)
     # sub_conn_df = resample_sum(sub_conn_df, sample_interval)
     conn_df = pd.concat([conn_df, sub_conn_df])
+
+print(conn_df.info())
+
 print("Size of Conn DF -> {}MB".format(size_in_megabytes(conn_df)))
 conn_df = resample_sum(conn_df, "1min")
 conn_df = conn_df.iloc[skip_samples_n:]
 conn_df = conn_df.loc[start_date(conn_files[0]) :]
 print("Size of Resampled Conn DF -> {}MB\n".format(size_in_megabytes(conn_df)))
+
+#conn_df.to_csv("conn_df.csv")
 
 conn_metric_intervals = ["30min", "1hour", "1day"]
 conn_metrics_to_report = ["flow_count", "duration"]
