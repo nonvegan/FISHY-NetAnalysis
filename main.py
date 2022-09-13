@@ -117,6 +117,7 @@ def print_metric_info(df, zeek_file, metric_aggr, metric, metric_interval):
 
 # conn.log
 n_days = 7
+logs_input_path = "./logs"
 conn_metric_intervals = ["30min", "1H", "24H"]
 conn_metrics_to_sum = ["flow_count", "duration"]
 conn_metrics_to_count_uniques = [
@@ -128,7 +129,7 @@ conn_metrics_to_count_uniques = [
     "resp_l2_addr",
 ]
 
-conn_filenames = sorted(glob("logs/conn*.log"))[0:n_days]
+conn_filenames = sorted(glob("{}/conn*.log".format(logs_input_path)))[0:n_days]
 conn_filenames_len = len(conn_filenames)
 
 conn_df = pd.DataFrame()
