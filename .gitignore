@@ -1,3 +1,4 @@
 *.html
 *.csv
+logs/*
 conn_csv.csv
