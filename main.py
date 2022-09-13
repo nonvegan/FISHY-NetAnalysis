@@ -14,7 +14,8 @@ simplefilter(action="ignore", category=FutureWarning)
 log_to_df = JSONLogToDataFrame()
 
 skip_samples_n = 0
-n_days = 2
+n_days = 3
+
 
 def add_totals(df):
     df["total_pkts"] = df["orig_pkts"] + df["resp_pkts"]
@@ -39,7 +40,11 @@ def size_in_megabytes(x):
 def log_to_df_print(filename):
     global conn_filenames_len
     global conn_filenames_index
-    print("Loading {} to a dataframe {}/{}".format(filename, conn_filenames_index + 1, conn_filenames_len))
+    print(
+        "Loading {} to a dataframe {}/{}".format(
+            filename, conn_filenames_index + 1, conn_filenames_len
+        )
+    )
     return log_to_df.create_dataframe(filename)
 
 
@@ -52,18 +57,25 @@ def fig_apply_general_template(fig):
     fig.update_xaxes(showgrid=False, zeroline=False)
     fig.update_yaxes(showgrid=False, zeroline=False)
     fig.update_layout(
-            hovermode="x unified",
-            title={"x": 0.5, "xanchor": "center", "yanchor": "top"},
-            font=dict(size=18, color="RebeccaPurple"),
-            yaxis=dict(autorange=True, fixedrange=False),
-            xaxis=dict(rangeslider=dict(visible=False)),
-            )
+        hovermode="x unified",
+        title={"x": 0.5, "xanchor": "center", "yanchor": "top"},
+        font=dict(size=18, color="RebeccaPurple"),
+        yaxis=dict(autorange=True, fixedrange=False),
+        xaxis=dict(rangeslider=dict(visible=False)),
+    )
 
 
 # conn.log
 conn_metric_intervals = ["30min", "1hour", "1day"]
 conn_metrics_to_sum = ["flow_count", "duration"]
-conn_metrics_to_count_unique = ["id.orig_h", "id.resp_h", "id.orig_p", "id.resp_p", "orig_l2_addr", "resp_l2_addr"]
+conn_metrics_to_count_unique = [
+    "id.orig_h",
+    "id.resp_h",
+    "id.orig_p",
+    "id.resp_p",
+    "orig_l2_addr",
+    "resp_l2_addr",
+]
 
 conn_filenames = sorted(glob("logs/conn*.log"))[0:n_days]
 conn_filenames_len = len(conn_filenames)
@@ -77,21 +89,23 @@ for i in range(len(conn_filenames)):
     sub_conn_df = add_totals(sub_conn_df)
     sub_conn_df = add_flow_count(sub_conn_df)
 
-    for col in list(sub_conn_df):
-        if col not in conn_metrics_to_sum + conn_metrics_to_count_unique:
-            sub_conn_df.drop(col, axis=1, inplace=True)
+    sub_conn_df.drop(
+        set(sub_conn_df) - set(conn_metrics_to_sum + conn_metrics_to_count_unique),
+        axis=1,
+        inplace=True,
+    )
 
-    conn_df_uniques = pd.concat([conn_df_uniques, sub_conn_df[conn_metrics_to_count_unique]])
+    conn_df_uniques = pd.concat(
+        [conn_df_uniques, sub_conn_df[conn_metrics_to_count_unique]]
+    )
     sub_conn_df.drop(conn_metrics_to_count_unique, inplace=True, axis=1)
 
     conn_df = pd.concat([conn_df, sub_conn_df])
 
 print(conn_df.info())
-print(list(conn_df))
 print("Size of Conn DF -> {}MB".format(size_in_megabytes(conn_df)))
 
 print(conn_df_uniques.info())
-print(list(conn_df_uniques))
 print("Size of Conn DF Unique -> {}MB".format(size_in_megabytes(conn_df_uniques)))
 
 conn_df = resample_sum(conn_df, "1min")
@@ -99,10 +113,10 @@ conn_df = conn_df.iloc[skip_samples_n:]
 conn_df = conn_df.loc[log_date(conn_filenames[0]) :]
 print("Size of Resampled Conn DF -> {}MB\n".format(size_in_megabytes(conn_df)))
 
-#conn_df.to_csv("conn_df.csv")
+# conn_df.to_csv("conn_df.csv")
 
 if path.exists("./metrics"):
-    rmtree("./metrics");
+    rmtree("./metrics")
 mkdir("./metrics")
 
 for metric_interval in conn_metric_intervals:
@@ -111,25 +125,27 @@ for metric_interval in conn_metric_intervals:
         id_min = conn_df[metric].idxmin()
         id_max = conn_df[metric].idxmax()
         print(
-                "{}/{}: Avg: {}, Min: {} ({}), Max: {} ({})".format(
-                    metric,
-                    metric_interval,
-                    conn_df[metric].mean(),
-                    conn_df[metric][id_min],
-                    id_min,
-                    conn_df[metric][id_max],
-                    id_max,
-                    )
-                )
+            "{}/{}: Avg: {}, Min: {} ({}), Max: {} ({})".format(
+                metric,
+                metric_interval,
+                conn_df[metric].mean(),
+                conn_df[metric][id_min],
+                id_min,
+                conn_df[metric][id_max],
+                id_max,
+            )
+        )
         fig = go.Figure()
         fig.update_layout(
-                title={"text": "Connection Sum({})/{}".format(metric, metric_interval)},
-                xaxis_title="timestamp",
-                yaxis_title=metric,
-                )
+            title={"text": "Connection Sum({})/{}".format(metric, metric_interval)},
+            xaxis_title="timestamp",
+            yaxis_title=metric,
+        )
         fig_apply_general_template(fig)
         fig.add_trace(go.Scatter(x=conn_df.index, y=conn_df[metric]))
-        fig.write_html("metrics/{}_{}_{}_{}.html".format("conn", "sum", metric, metric_interval))
+        fig.write_html(
+            "metrics/{}_{}_{}_{}.html".format("conn", "sum", metric, metric_interval)
+        )
 
     print("")
 # conn_df.to_csv("conn_df.csv")
