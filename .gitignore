@@ -1,4 +1,5 @@
 *.html
 *.csv
+*.zeek
 logs/*
 conn_csv.csv

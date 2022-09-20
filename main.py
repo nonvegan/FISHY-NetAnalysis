@@ -116,9 +116,9 @@ def print_metric_info(df, zeek_file, metric_aggr, metric, metric_interval):
 
 
 # conn.log
-n_days = 7
+n_days = 3
 logs_input_path = "./logs"
-conn_metric_intervals = ["30min", "1H", "24H"]
+conn_metric_intervals = ["1H", "24H"]
 conn_metrics_to_sum = ["flow_count", "duration"]
 conn_metrics_to_count_uniques = [
     "id.orig_h",
