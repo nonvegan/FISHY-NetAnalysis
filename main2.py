@@ -89,7 +89,7 @@ def write_metric_figure(df, zeek_file, metric_aggr, metric, metric_interval, bas
             base_path,
             metric_aggr,
             metric,
-            zeek_file,
+            zeek_file.replace(':', '.'),
             metric_aggr,
             metric,
             metric_interval,
@@ -116,33 +116,24 @@ def print_metric_info(df, zeek_file, metric_aggr, metric, metric_interval):
 
 
 # conn.log
-n_days = 2
+n_days = 3
 logs_input_path = "./logs"
-conn_metric_intervals = ["1H", "24H"]
+conn_metric_intervals = ["1H"]
 conn_metrics_to_sum = ["flow_count", "duration","flow_count", "orig_pkts", "resp_pkts", "orig_bytes", "resp_bytes", "orig_ip_bytes", "resp_ip_bytes"]
-conn_metrics_to_count_uniques = [
-    "id.orig_h",
-    "id.resp_h",
-    "id.orig_p",
-    "id.resp_p",
-    # "orig_l2_addr",
-    # "resp_l2_addr",
-]
+conn_metrics_to_count_uniques = ["id.orig_h", "id.resp_h", "id.orig_p", "id.resp_p", "orig_l2_addr", "resp_l2_addr"]
 
 conn_filenames = sorted(glob("{}/conn*.log".format(logs_input_path)))[0:n_days]
 conn_filenames_len = len(conn_filenames)
 
 conn_df = pd.DataFrame()
-conn_df_uniques = pd.DataFrame()
 
 for i in range(len(conn_filenames)):
     conn_filenames_index = i
     sub_conn_df = log_to_df_print(conn_filenames[i])
-    # sub_conn_df = add_totals(sub_conn_df)
     sub_conn_df = add_flow_count(sub_conn_df)
 
     sub_conn_df.drop(
-        set(sub_conn_df) - set(conn_metrics_to_sum + conn_metrics_to_count_uniques + ["orig_l2_addr", "resp_l2_addr"]),
+        set(sub_conn_df) - set(conn_metrics_to_sum + conn_metrics_to_count_uniques),
         axis=1,
         inplace=True,
     )
@@ -152,18 +143,16 @@ for i in range(len(conn_filenames)):
 print(conn_df.info())
 print("Size of Conn DF -> {}MB".format(size_in_megabytes(conn_df)))
 
-orig_macs = conn_df["orig_l2_addr"].unique()
-resp_macs = conn_df["resp_l2_addr"].unique()
-
-all_macs = set(list(orig_macs) + list(resp_macs))
-
 if path.exists("./metrics"):
     rmtree("./metrics")
     mkdir("./metrics")
 
+orig_macs = conn_df["orig_l2_addr"].unique()
+resp_macs = conn_df["resp_l2_addr"].unique()
+all_macs = set(list(orig_macs) + list(resp_macs))
 
 for mac_address in all_macs:
-    print("mac_address_{}\n".format(mac_address.replace(':', '.')))
+    print("Baking mac_address_{}\n".format(mac_address.replace(':', '.')))
 
     orig_mac_df = conn_df[conn_df.orig_l2_addr == mac_address].copy(deep=True)
     orig_mac_df.drop(set(["orig_l2_addr"]), axis=1, inplace=True)
@@ -191,32 +180,21 @@ for mac_address in all_macs:
     del resp_mac_df
 
     resampled_mac_df = resample_sum(mac_df, "1min").loc[log_date(conn_filenames[0]) :]
-
     for metric_interval in conn_metric_intervals:
         resampled_mac_df = resample_sum(resampled_mac_df, pd.Timedelta(metric_interval))
         for conn_metric_to_sum in ["flow_count", "duration", "flow_initiator", "sent_pkts", "received_pkts", "sent_bytes", "received_bytes", "sent_ip_bytes", "received_ip_bytes"]:
             write_metric_figure(resampled_mac_df, mac_address, "sum",
                                 conn_metric_to_sum, metric_interval, "./metrics/{}".format(mac_address.replace(':', '.')))
+    del resampled_mac_df
 
-
-#TODO: UNIQUE
-# for metric_interval in conn_metric_intervals:
-#     resampled_conn_df_uniques = resample_uniq(conn_df_uniques, metric_interval).loc[
-#         log_date(conn_filenames[0]) :
-#     ]
-#     for conn_metric_to_count_uniques in conn_metrics_to_count_uniques:
-#         print_metric_info(
-#             resampled_conn_df_uniques,
-#             "conn",
-#             "unique",
-#             conn_metric_to_count_uniques,
-#             metric_interval,
-#         )
-#         write_metric_figure(
-#             resampled_conn_df_uniques,
-#             "conn",
-#             "unique",
-#             conn_metric_to_count_uniques,
-#             metric_interval,
-#             "./metrics",
-#         )
+    for metric_interval in conn_metric_intervals:
+        resampled_conn_df_uniques = resample_uniq(mac_df, metric_interval).loc[log_date(conn_filenames[0]):]
+        for conn_metric_to_count_uniques in ["own_ip_address", "own_port_address", "mutual_mac_address", "mutual_ip_address", "mutual_port_address"]:
+         write_metric_figure(
+             resampled_conn_df_uniques,
+             mac_address,
+             "unique",
+             conn_metric_to_count_uniques,
+             metric_interval,
+             "./metrics/{}".format(mac_address.replace(':', '.')))
+        del resampled_conn_df_uniques
