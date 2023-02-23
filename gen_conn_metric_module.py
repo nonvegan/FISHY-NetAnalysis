@@ -1,13 +1,12 @@
-
-
 module_name = "METRIC_TRACK"
 module_dependencies = ["base/protocols/conn", "base/frameworks/sumstats", "base/frameworks/notice"] 
-notice_type_name = "Metric_threshold_crossed"
+notice_type_name_prefix = "Metric_threshold_crossed"
 
 def output_conn_sum_metric(metric_name, metric_interval, metric_threshold):
     with open("{}_sum_metric.zeek".format(metric_name), "w") as file_handle:
 
         # String vars
+        notice_type_name = "{}_{}_sum".format(notice_type_name_prefix, metric_name)
         metric_limit_var_str = "metric_{}_limit".format(metric_name)
         metric_interval_var_str = "metric_{}_epoch_interval".format(metric_name)
         metric_sumstats_stream_name_str = "metric.conn.{}".format(metric_name)
@@ -36,7 +35,7 @@ def output_conn_sum_metric(metric_name, metric_interval, metric_threshold):
         file_handle.write("\t\t$threshold_crossed(key: SumStats::Key, result: SumStats::Result) =\n\t\t{\n")
         file_handle.write("\t\tlocal r = result[\""+ metric_sumstats_stream_name_str +"\"];\n")
         file_handle.write("\t\tNOTICE([$note={},\n".format(notice_type_name))
-        file_handle.write("\t\t\t$msg=fmt(\"Threshold of %s crossed (%d in the last %s)\", {}, r$dbl, {}),\n"
+        file_handle.write("\t\t\t$msg=fmt(\"Threshold of %s crossed (%f in the last %s)\", \"{}\", r$sum, {}),\n"
                           .format(metric_name, metric_interval_var_str))
         file_handle.write("\t\t\t$identifier=\""+ metric_sumstats_name_str +"\"]);\n\t\t}\n")
         file_handle.write("\t]);\n")
@@ -44,9 +43,11 @@ def output_conn_sum_metric(metric_name, metric_interval, metric_threshold):
 
         # Event
         file_handle.write("\nevent Conn::log_conn(rec: Conn::Info)\n{\n")
-        file_handle.write("\tSumStats::observe(\"metric.conn.{}\", SumStats::Key(), SumStats::Observation($dbl=rec${}))\n"
+        file_handle.write("\tif(rec?${})\n".format(metric_name));
+        file_handle.write("\t\tSumStats::observe(\"metric.conn.{}\", SumStats::Key(), SumStats::Observation($dbl=|rec${}|));\n"
                           .format(metric_name, metric_name));
         file_handle.write("}\n")
 
 
-output_conn_sum_metric("duration", "30secs", "30")
+output_conn_sum_metric("resp_bytes", "30secs", "20000000")
+output_conn_sum_metric("duration", "30secs", "2")
