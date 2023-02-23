@@ -2,4 +2,4 @@
 *.csv
 *.zeek
 *.log
-__pycache__/*
+gui/__pycache__/*
