@@ -5,7 +5,7 @@
 
 
 ## Introduction
-In this document we provide a simple and brief description of the FISHY behavioral analysis component proposed architecture and it's basic required installation/integration steps.
+In this document we provide a simple and brief description of Zeek...
 
 ## Fundamentals
 
