@@ -43,7 +43,17 @@ def output_conn_sum_metric(metric_name, metric_threshold, metric_interval, file_
 
         # Event
         file_handle.write("\nevent Conn::log_conn(rec: Conn::Info)\n{\n")
-        file_handle.write("\tif(rec?${})\n".format(metric_name));
-        file_handle.write("\t\tSumStats::observe(\"metric.conn.{}\", SumStats::Key(), SumStats::Observation($dbl=|rec${}|));\n"
+
+        if(metric_name=="sessions"):
+            file_handle.write("\tSumStats::observe(\"metric.conn.{}\", SumStats::Key(), SumStats::Observation($dbl=1));\n".format(metric_name))
+        elif(metric_name=="total_pkts"):
+            file_handle.write("\t\tSumStats::observe(\"metric.conn.{}\", SumStats::Key(), SumStats::Observation($dbl=|rec${} + rec${}|));\n"
+                          .format(metric_name, "orig_pkts","resp_pkts"));
+        elif(metric_name=="total_bytes"):
+            file_handle.write("\t\tSumStats::observe(\"metric.conn.{}\", SumStats::Key(), SumStats::Observation($dbl=|rec${} + rec${}|));\n"
+                          .format(metric_name, "orig_bytes","resp_bytes"));
+        else:
+            file_handle.write("\tif(rec?${})\n".format(metric_name));
+            file_handle.write("\t\tSumStats::observe(\"metric.conn.{}\", SumStats::Key(), SumStats::Observation($dbl=|rec${}|));\n"
                           .format(metric_name, metric_name));
         file_handle.write("}\n")

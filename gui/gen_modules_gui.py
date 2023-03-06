@@ -52,8 +52,7 @@ def generate_script(sender, app_data):
 
 dpg.create_context()
 dpg.create_viewport(
-    title="Zeek Metric Module generator", width=550, height=500, resizable=False
-)
+    title="Zeek Conn Metric Module Generator", width=550, height=500, resizable=True)
 # dpg.set_global_font_scale(1)
 
 with dpg.handler_registry():
@@ -83,7 +82,7 @@ with dpg.window(label="Change Channel", tag="Primary Window"):
 
     dpg.add_text("Metric Measure:")
     dpg.add_combo(
-        items=["duration", "resp_bytes", "resp_pkts"], tag="metric_measure", width=300
+        items=["sessions", "duration", "total_bytes", "total_pkts", "orig_bytes", "orig_pkts", "resp_bytes", "resp_pkts"], tag="metric_measure", width=300
     )
 
     dpg.add_text("Metric Threshold:")
