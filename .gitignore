@@ -2,4 +2,5 @@
 *.csv
 *.zeek
 *.log
+*.zip
 gui/__pycache__/*

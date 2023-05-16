@@ -101,12 +101,14 @@ def print_metric_info(df, zeek_file, metric_aggr, metric, metric_interval):
     id_min = df[metric].idxmin()
     id_max = df[metric].idxmax()
     print(
-        "{} {}({})/{}: Avg: {}, Min: {} ({}), Max: {} ({})\n".format(
+        "{} {}({})/{}: Avg: {}, Var: {}, StdDev: {}, Min: {} ({}), Max: {} ({})\n".format(
             zeek_file,
             metric_aggr,
             metric,
             metric_interval,
             df[metric].mean(),
+            df[metric].var(),
+            df[metric].std(),
             df[metric][id_min],
             id_min,
             df[metric][id_max],
@@ -176,23 +178,23 @@ for metric_interval in conn_metric_intervals:
             conn_df, "conn", "sum", conn_metric_to_sum, metric_interval, "./metrics"
         )
 
-for metric_interval in conn_metric_intervals:
-    resampled_conn_df_uniques = resample_uniq(conn_df_uniques, metric_interval).loc[
-        log_date(conn_filenames[0]) :
-    ]
-    for conn_metric_to_count_uniques in conn_metrics_to_count_uniques:
-        print_metric_info(
-            resampled_conn_df_uniques,
-            "conn",
-            "unique",
-            conn_metric_to_count_uniques,
-            metric_interval,
-        )
-        write_metric_figure(
-            resampled_conn_df_uniques,
-            "conn",
-            "unique",
-            conn_metric_to_count_uniques,
-            metric_interval,
-            "./metrics",
-        )
+# for metric_interval in conn_metric_intervals:
+#     resampled_conn_df_uniques = resample_uniq(conn_df_uniques, metric_interval).loc[
+#         log_date(conn_filenames[0]) :
+#     ]
+#     for conn_metric_to_count_uniques in conn_metrics_to_count_uniques:
+#         print_metric_info(
+#             resampled_conn_df_uniques,
+#             "conn",
+#             "unique",
+#             conn_metric_to_count_uniques,
+#             metric_interval,
+#         )
+#         write_metric_figure(
+#             resampled_conn_df_uniques,
+#             "conn",
+#             "unique",
+#             conn_metric_to_count_uniques,
+#             metric_interval,
+#             "./metrics",
+#         )
